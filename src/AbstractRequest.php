@@ -41,19 +41,19 @@ abstract class AbstractRequest {
 		return $this->request(self::GET, $parameters);
 	}
 
-	public function post($parameters = array()) {
-		return $this->request(self::POST, $parameters);
+	public function post($parameters, $data) {
+		return $this->request(self::POST, $parameters, $data);
 	}
 
-	public function put($parameters = array()) {
-		return $this->request(self::PUT, $parameters);
+	public function put($parameters, $data) {
+		return $this->request(self::PUT, $parameters, $data);
 	}
 
-	public function delete($parameters = array()) {
+	public function delete($parameters) {
 		return $this->request(self::DELETE, $parameters);
 	}
 
-	private function request($method, $data = array()) {
+	private function request($method, $parameters = array(), $data = array()) {
 		$result = false;
 
 		$url = self::BASE_URL.'/'.$this->config['version'].'/'.$this->getPath();
@@ -62,10 +62,15 @@ abstract class AbstractRequest {
 
 		$options = array(
 			CURLOPT_RETURNTRANSFER => 1,
-			CURLOPT_URL => $url.'?'.http_build_query(array(
-				'apiKey' => $this->config['api-key'],
-				'format' => 'json'
-			)),
+			CURLOPT_URL => $url.'?'.http_build_query(
+				array_merge(
+					$parameters,
+					array(
+						'apiKey' => $this->config['api-key'],
+						'format' => 'json'
+					)
+				)
+			),
 			CURLOPT_HEADER => 1,
 			CURLOPT_RETURNTRANSFER => 1,
 			CURLINFO_HEADER_OUT => true
@@ -74,7 +79,6 @@ abstract class AbstractRequest {
 		$httpHeaders = array();
 
 		if($method == self::GET) {
-			if(!empty($data)) $options[CURLOPT_URL] .= '&'.http_build_query($data);
 			$this->log('GET '.$options[CURLOPT_URL]);
 			$responseClass = 'GetResponse';
 		} else if($method == self::PUT) {
@@ -91,7 +95,6 @@ abstract class AbstractRequest {
 			$this->log(json_encode($data));
 			$responseClass = 'PostResponse';
 		} else if($method == self::DELETE) {
-			$options[CURLOPT_URL] .= '/'.$data;
 			$options[CURLOPT_CUSTOMREQUEST] = 'DELETE';
 			$this->log('DELETE '.$options[CURLOPT_URL]);
 			$responseClass = 'DeleteResponse';
