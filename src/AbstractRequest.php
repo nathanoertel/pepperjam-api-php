@@ -12,6 +12,7 @@ abstract class AbstractRequest {
 	public $env;
 
 	protected $config = array(
+		'version' => '20120402',
 		'max_retries' => 3
 	);
 
@@ -80,24 +81,24 @@ abstract class AbstractRequest {
 
 		if($method == self::GET) {
 			$this->log('GET '.$options[CURLOPT_URL]);
-			$responseClass = 'GetResponse';
+			$responseClass = 'PepperjamAPI\GetResponse';
 		} else if($method == self::PUT) {
 			$options[CURLOPT_POST] = 1;
 			$options[CURLOPT_POSTFIELDS] = $this->getPostFields($data);
 			$options[CURLOPT_CUSTOMREQUEST] = 'PUT';
 			$this->log('PUT '.$options[CURLOPT_URL]);
 			$this->log(json_encode($data));
-			$responseClass = 'PutResponse';
+			$responseClass = 'PepperjamAPI\PutResponse';
 		} else if($method == self::POST) {
 			$options[CURLOPT_POST] = 1;
 			$options[CURLOPT_POSTFIELDS] = $this->getPostFields($data);
 			$this->log('POST '.$options[CURLOPT_URL]);
 			$this->log(json_encode($data));
-			$responseClass = 'PostResponse';
+			$responseClass = 'PepperjamAPI\PostResponse';
 		} else if($method == self::DELETE) {
 			$options[CURLOPT_CUSTOMREQUEST] = 'DELETE';
 			$this->log('DELETE '.$options[CURLOPT_URL]);
-			$responseClass = 'DeleteResponse';
+			$responseClass = 'PepperjamAPI\DeleteResponse';
 		}
 
 		$options[CURLOPT_HTTPHEADER] = $this->getHeaders($options[CURLOPT_URL], $method, $httpHeaders);
