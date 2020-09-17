@@ -31,9 +31,8 @@ abstract class AbstractRequest {
 		if(!isset($config['version'])) {
 			throw new \Exception('Configuration missing version');
 		}
-	
 		// Apply some defaults.
-		$this->config = array_merge_recursive($this->config, $config);
+		$this->config = array_replace_recursive($this->config, $config);
 		
 		$this->logger = $logger;
 	}
@@ -118,7 +117,7 @@ abstract class AbstractRequest {
 			$headers = substr($response, 0, $headerSize);
 			$body = substr($response, $headerSize);
 
-			$result = new $responseClass($headers, $body);
+			$result = new $responseClass($headers, $body, $method);
 
 			unset($headerSize, $headers, $body);
 		} else {
